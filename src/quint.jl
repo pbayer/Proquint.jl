@@ -66,11 +66,6 @@ function uint2quint(x::T, sep="-"; short=false) where T<:Integer
     end
     return s
 end
-#
-# 0x0a484904
-# "0000 10 1001 00 1000  0100 10 0100 00 0100"
-#    b   o   n   a   m  -  h   o   h   a   h
-#
 
 """
     quint2uint(qs::String)
