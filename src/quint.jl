@@ -2,10 +2,20 @@
 # Proquint.jl by P. Bayer, MIT license
 #
 
-i2c(i) = "bdfghjklmnprstvz"[i+1]
-c2i(c) = findfirst(==(c), "bdfghjklmnprstvz") - 1
-i2v(i) = "aiou"[i+1]
-v2i(c) = findfirst(==(c), "aiou") - 1
+const conson = "bdfghjklmnprstvz"
+const vowels = "aiou"
+const d = Dict{Char,Int}()
+for i in eachindex(conson)
+    d[conson[i]] = i-1
+end
+for i in eachindex(vowels)
+    d[vowels[i]] = i-1
+end
+
+c2i(c) = d[c]
+i2v(i) = vowels[i+1]
+i2c(i) = conson[i+1]
+
 function quint(i)
     q = fill('x',5)
     q[5] = i2c(i & 0xF)
@@ -17,20 +27,21 @@ function quint(i)
 end
 
 function squint(i)
-    s = [(i>>(12,10,6,4,0)[j]) & (0xF,0x3,0xF,0x3,0xF)[j] for j in 1:5]
-    sq = ""; push = false
-    for j in eachindex(s)
-        s[j] != 0 && (push = true)
-        push && (sq *= isodd(j) ? i2c(s[j]) : i2v(s[j]))
+    s = ((i>>(12,10,6,4,0)[j]) & (0xF,0x3,0xF,0x3,0xF)[j] for j in 1:5)
+    q = fill('x',5); push = false; k = 1
+    for j in s
+        j != 0 && (push = true)
+        push && (q[k] = isodd(k) ? i2c(j) : i2v(j))
+        k += 1
     end
-    return String(sq)
+    return String(filter(!=('x'), q))
 end
 
-function uint(q)
+function uint(q::T) where T<:AbstractString
     res = 0
     j = 5 - length(q)
     for i in eachindex(q)
-        res += (isodd(i+j) ? c2i(q[i]) : v2i(q[i])) << (12,10,6,4,0)[i+j]
+        res += c2i(q[i]) << (12,10,6,4,0)[i+j]
     end
     return UInt(res)
 end
@@ -81,15 +92,12 @@ julia> quint2uint("lusab-d")
 0x7f000001
 ```
 """
-function quint2uint(qs::String)
+function quint2uint(qs::String, U::Type{T}=UInt) where T<:Unsigned
     qa = split(qs, "-") |> reverse
     l = length(qa)
-    T = l == 1 ? UInt16 :
-        l == 2 ? UInt32 :
-        l <= 4 ? UInt64 : UInt128
     res = 0
-    for i in 1:length(qa)
+    for i in 1:l
         res += uint(qa[i]) << ((i-1)*16)
     end
-    return T(res)
+    return U(res)
 end

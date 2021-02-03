@@ -58,9 +58,41 @@ julia> uint2quint(0x7f000001)
 julia> uint2quint(0x7f000001, short=true) # this gives the short version
 "lusab-d"
 
-julia> quint2uint("lusab-babad")
+julia> quint2uint("lusab-babad", UInt32)
 0x7f000001
 
-julia> quint2uint("lusab-d")
+julia> quint2uint("lusab-d", UInt32)
 0x7f000001
+```
+
+## Benchmarks
+
+```julia
+julia> using BenchmarkTools
+
+julia> @btime uint2quint(0x7f000001)
+  218.109 ns (9 allocations: 416 bytes)
+"lusab-babad"
+
+julia> @btime uint2quint(0x7f000001, short=true)
+  289.967 ns (11 allocations: 640 bytes)
+"lusab-d"
+
+julia> @btime quint2uint("lusab-babad", UInt32)
+  331.712 ns (3 allocations: 320 bytes)
+0x7f000001
+
+julia> @btime quint2uint("lusab-d", UInt32)
+  282.788 ns (3 allocations: 320 bytes)
+0x7f000001
+
+julia> versioninfo()
+Julia Version 1.5.3
+Commit 788b2c77c1 (2020-11-09 13:37 UTC)
+Platform Info:
+  OS: macOS (x86_64-apple-darwin18.7.0)
+  CPU: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-9.0.1 (ORCJIT, skylake)
 ```

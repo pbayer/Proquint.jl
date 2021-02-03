@@ -55,10 +55,10 @@ julia> uint2quint(0x7f000001)
 julia> uint2quint(0x7f000001, short=true) # this gives the short version
 "lusab-d"
 
-julia> quint2uint("lusab-babad")
+julia> quint2uint("lusab-babad", UInt32)
 0x7f000001
 
-julia> quint2uint("lusab-d")
+julia> quint2uint("lusab-d", UInt32)
 0x7f000001
 ```
 """
