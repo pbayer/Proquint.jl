@@ -29,6 +29,11 @@ Whole 16-bit word, where "con" = consonant, "vo" = vowel:
 
 Proquints are separated by dashes `-`.
 
+## Short Form (extension)
+
+The short form does not encode leading zeros of 16-bit words and 
+if an entire word is 0, it gets encoded as "x".
+
 ## Example
 
 The `UInt32` `0x0a484904` is in bit representation:

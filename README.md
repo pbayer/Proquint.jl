@@ -32,22 +32,26 @@ Whole 16-bit word, where "con" = consonant, "vo" = vowel:
 
 Proquints are separated by dashes `-`.
 
+## Short Form (extension)
+
+The short form does not encode leading zeros of 16-bit words and if an entire word is 0, it gets encoded as "x".
+
 ## Example
 
 The `UInt32` `0x0a484904` is in bit representation:
 
     0000 10 1001 00 1000  0100 10 0100 00 0100
       b   o   n   a   m  -  h   o   h   a   h
-          o   n   a   m  -  h   o   h   a   h   # short version
+          o   n   a   m  -  h   o   h   a   h   # short form
 
 The IP address `127.0.0.1` is a `0x7f000001` `UInt32`:
 
     0111 11 1100 00 0000  0000 00 0000 00 0001
       l   u   s   a   b  -  b   a   b   a   d
-      l   u   s   a   b  -                  d   # short version
+      l   u   s   a   b  -                  d   # short form
 
 Proquints are unambiguous and can be generated from integers
-and converted back to them:
+and converted back to them.
 
 ```julia
 julia> using Proquint
@@ -63,6 +67,35 @@ julia> quint2uint("lusab-babad", UInt32)
 
 julia> quint2uint("lusab-d", UInt32)
 0x7f000001
+```
+
+## 64-bit Words
+
+```julia
+julia> a = [123]
+1-element Array{Int64,1}:
+ 123
+
+julia> addr = convert(UInt, pointer_from_objref(a))
+0x00000001150cf910
+
+julia> uint2quint(addr)
+"babab-babad-dihas-zohib"
+
+julia> uint2quint(addr, short=true)
+"x-d-dihas-zohib"
+
+julia> quint2uint("babab-babad-dihas-zohib")
+0x00000001150cf910
+
+julia> quint2uint("x-d-dihas-zohib")
+0x00000001150cf910
+
+julia> uint2quint(0x00000001150c0000, short=true)
+"x-d-dihas-x"
+
+julia> quint2uint("x-d-dihas-x")
+0x00000001150c0000
 ```
 
 ## Benchmarks
